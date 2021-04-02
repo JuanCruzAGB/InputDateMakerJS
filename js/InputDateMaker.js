@@ -254,7 +254,6 @@ export class InputDateMaker extends Class {
 
     /**
      * * Makes a new <input> value.
-     *
      * @memberof InputDateMaker
      */
     detect () {
