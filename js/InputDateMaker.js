@@ -53,7 +53,7 @@ let days = {
     ],
 };
 
-/** @var {object} defaultProps Default InputDateMaker properties. */
+/** @var {object} defaultProps Default properties. */
 let defaultProps = {
     id: 'calendar-1',
     lang: 'en',
@@ -64,6 +64,11 @@ let defaultProps = {
     today: new Date(),
     // TODO button_prev: null,
     // TODO button_next: null,
+};
+
+/** @var {object} deafultState Default state. */
+let deafultState = {
+    enablePastDates: true,
 };
 
 /**
@@ -100,7 +105,7 @@ export class InputDateMaker extends Class {
         params: {
             //
     }}) {
-        super({ ...defaultProps, ...props }, state);
+        super({ ...defaultProps, ...props }, { ...deafultState, ...state });
         this.setCallbacks({ default: callback });
         this.setHTML(`#${ this.props.id }`);
         this.generateMonthDays(new Date());
@@ -148,7 +153,6 @@ export class InputDateMaker extends Class {
         let header = document.createElement('section');
         header.classList.add('month', 'grid', 'grid-cols-7', 'mb-4');
         this.calendar.appendChild(header);
-        this.printArrows();
             let buttonDiv = document.createElement('div');
             buttonDiv.classList.add('flex', 'justify-center', 'items-center');
             header.appendChild(buttonDiv);
