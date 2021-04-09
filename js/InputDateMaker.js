@@ -55,7 +55,7 @@ let days = {
 
 /** @var {object} defaultProps Default properties. */
 let defaultProps = {
-    id: 'calendar-1',
+    id: 'input-1',
     lang: 'en',
     // ? datesFilter: false,
     availableWeekDays: [],
@@ -66,9 +66,10 @@ let defaultProps = {
     // TODO button_next: null,
 };
 
-/** @var {object} deafultState Default state. */
-let deafultState = {
+/** @var {object} defaultState Default state. */
+let defaultState = {
     enablePastDates: true,
+    enableToday: true,
 };
 
 /**
@@ -82,35 +83,41 @@ export class InputDateMaker extends Class {
     /**
      * * Creates an instance of InputDateMaker.
      * @param {object} [props] InputDateMaker properties:
-     * @param {string} [id='calendar-1'] Input HTML element primary key.
+     * @param {string} [id='input-1'] Input HTML element primary key.
      * @param {string} [lang='en'] Calendar location.
      * @param {object} [availableWeekDays] Calendar available week days.
      * @param {date} [today] Today's date.
      * @param {object} [state] InputDateMaker state:
      * @param {boolean} [enablePastDates=true] Enable past dates.
+     * @param {boolean} [enableToday=true] Enable today's date.
      * @param {object} [callback] InputDateMaker callback:
      * @param {fuction} [function] On change date function callback.
      * @param {object} [params] On change date function callback params.
      * @memberof InputDateMaker
      */
     constructor (props = {
-        id: 'calendar-1',
+        id: 'input-1',
         lang: 'en',
         availableWeekDays: [],
         today: new Date(),
     }, state = {
         enablePastDates: true,
+        enableToday: true,
     }, callback = {
-        function: function (e) { console.log('Date changed') },
+        function: function (e) { /* console.log('Date changed') */ },
         params: {
             //
     }}) {
-        super({ ...defaultProps, ...props }, { ...deafultState, ...state });
+        super({ ...defaultProps, ...props }, { ...defaultState, ...state });
         this.setCallbacks({ default: callback });
         this.setHTML(`#${ this.props.id }`);
         this.generateMonthDays(new Date());
         this.generateInnerHTML();
-        this.changeHTMLValue(this.props.today.toISOString().substring(0, 10));
+        if (this.state.enableToday) {
+            this.changeHTMLValue(this.props.today.toISOString().substring(0, 10));
+        } else {
+            this.changeHTMLValue();
+        }
     }
 
     /**
@@ -199,6 +206,7 @@ export class InputDateMaker extends Class {
      * @memberof InputDateMaker
      */
     printMain () {
+        this.inputs = [];
         let instance = this;
         let main = document.createElement('section');
         main.classList.add('days', 'grid', 'grid-cols-7', 'gap-2', 'xl:gap-4');
@@ -212,13 +220,19 @@ export class InputDateMaker extends Class {
             main.appendChild(date);
                 if (day - this.props.firstMonthDay.getDay() > 0 && day - this.props.firstMonthDay.getDay() <= this.props.lastMonthDay.getDate()) {
                     let input = document.createElement('input');
-                    input.id = `day-${ day }`;
+                    this.inputs.push(input);
+                    input.id = `${ this.props.id }-day-${ day }`;
                     input.type = 'radio';
-                    input.name = 'calendar-day';
+                    input.name = `${ this.props.id }-calendar-day`;
                     input.value = day - this.props.firstMonthDay.getDay();
-                    input.addEventListener('change', function (e) {
-                        instance.detect();
-                    })
+                    let label = document.createElement('label');
+                    label.classList.add('btn-date');
+                    label.htmlFor = `${ this.props.id }-day-${ day }`;
+                    label.addEventListener('click', function (e) {
+                        instance.changeHTMLValue(`${ instance.props.firstMonthDay.getFullYear() }-${ (instance.props.firstMonthDay.getMonth() + 1 < 10 ? `0${ instance.props.firstMonthDay.getMonth() + 1 }` : instance.props.firstMonthDay.getMonth() + 1) }-${ (day - instance.props.firstMonthDay.getDay() < 10 ? `0${ day - instance.props.firstMonthDay.getDay() }` : day - instance.props.firstMonthDay.getDay()) }`); 
+                    });
+                        let span = document.createElement('span');
+                        span.innerHTML = day - this.props.firstMonthDay.getDay();
                     if (this.html.value) {
                         let dateValue = this.html.value.split('-');
                         if (parseInt(dateValue[0]) === this.props.firstMonthDay.getFullYear() && parseInt(dateValue[1]) === this.props.firstMonthDay.getMonth() + 1 && parseInt(dateValue[2]) === day - this.props.firstMonthDay.getDay()) {
@@ -227,11 +241,6 @@ export class InputDateMaker extends Class {
                     } else if (this.props.today.getMonth() === this.props.firstMonthDay.getMonth() && day - this.props.firstMonthDay.getDay() === this.props.today.getDate() && !this.html.value) {
                         input.checked = true;
                     }
-                    let label = document.createElement('label');
-                    label.classList.add('btn-date');
-                    label.htmlFor = `day-${ day }`;
-                        let span = document.createElement('span');
-                        span.innerHTML = day - this.props.firstMonthDay.getDay();
                     if (this.props.availableWeekDays.length) {
                         input.disabled = true;
                         for (const dayAvailable of this.props.availableWeekDays) {
@@ -247,21 +256,20 @@ export class InputDateMaker extends Class {
                         date.appendChild(label);
                         label.appendChild(span);
                     }
-                    if (this.state.enablePastDates) {
-                        if (day - this.props.firstMonthDay.getDay() < 1 || this.props.firstMonthDay.getMonth() < this.props.today.getMonth()) {
+                    if (!this.state.enablePastDates) {
+                        if (day - this.props.firstMonthDay.getDay() < 1 || this.props.firstMonthDay.getMonth() < this.props.today.getMonth() || (day - this.props.firstMonthDay.getDay() < this.props.today.getDate() && this.props.firstMonthDay.getMonth() === this.props.today.getMonth())) {
                             input.disabled = true;
+                            input.checked = false;
+                        }
+                    }
+                    if (!this.state.enableToday) {
+                        if (day - this.props.firstMonthDay.getDay() === this.props.today.getDate()) {
+                            input.disabled = true;
+                            input.checked = false;
                         }
                     }
                 }
         }
-    }
-
-    /**
-     * * Makes a new <input> value.
-     * @memberof InputDateMaker
-     */
-    detect () {
-        this.changeHTMLValue(`${ this.props.firstMonthDay.getFullYear() }-${ (this.props.firstMonthDay.getMonth() + 1 < 10 ? `0${ this.props.firstMonthDay.getMonth() + 1 }` : this.props.firstMonthDay.getMonth() + 1) }-${ (document.querySelector(`#${ this.props.id } + .calendar input[type=radio]:checked`).value < 10 ? `0${ document.querySelector(`#${ this.props.id } + .calendar input[type=radio]:checked`).value }` : document.querySelector(`#${ this.props.id } + .calendar input[type=radio]:checked`).value) }`);
     }
 
     /**
@@ -278,7 +286,7 @@ export class InputDateMaker extends Class {
 
     /**
      * * Change the <input> value.
-     * @param {string} value <input> new value.
+     * @param {string} [value] <input> new value.
      * @memberof InputDateMaker
      */
     changeHTMLValue (value) {
@@ -286,6 +294,10 @@ export class InputDateMaker extends Class {
         this.callbacks.default.function({ ...this.callbacks.default.params, inputDateMaker: this });
     }
 }
+
+// ? InputDateMaker childs
+InputDateMaker.months = months;
+InputDateMaker.days = days;
 
 // ? Default export 
 export default InputDateMaker;
