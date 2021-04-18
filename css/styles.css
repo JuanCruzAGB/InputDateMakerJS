@@ -1,9 +1,12 @@
-.calendar {
+:root {
     --calendar-background-color: var(--color-black);
     --calendar-button-color: var(--color-grey);
     --calendar-button-color-alternative: var(--color-black);
     --calendar-button-background-color: transparent;
     --calendar-button-background-color-alternative: var(--color-four);
+}
+
+.calendar {
     background-color: var(--calendar-background-color);
 }
 
