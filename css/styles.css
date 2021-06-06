@@ -1,87 +1,151 @@
-:root {
-    --calendar-background-color: var(--color-black);
-    --calendar-button-color: var(--color-grey);
-    --calendar-button-color-alternative: var(--color-black);
-    --calendar-button-background-color: transparent;
-    --calendar-button-background-color-alternative: var(--color-four);
-}
-
-.calendar {
-    background-color: var(--calendar-background-color);
-}
-
-.calendar .date {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.calendar input {
+input.hidden {
     display: none;
 }
 
-.calendar .month {
+.calendar-input {
+    color: var(--calendar-color, #000);
+    background-color: var(--calendar-background-color, #FFF);
+    border-radius: .25rem;
+    padding: .5rem;
+    display: grid;
+    gap: .5rem;
+}
+
+.calendar-input .month {
+    display: grid;
+    gap: .5rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     font-weight: bold;
 }
 
-.calendar .month button {
+.calendar-input .month .name {
+    grid-column: span 3 / span 3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.calendar-input .month > div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.calendar-input .month > div:nth-child(3) {
+    justify-content: flex-end;
+}
+
+.calendar-input .month > div button {
     flex-basis: 2rem;
     height: 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--calendar-button-color-alternative);
-    background-color: var(--calendar-button-background-color-alternative);
+    color: var(--calendar-arrow-button-color, #FFF);
+    background-color: var(--calendar-arrow-button-background-color, #BBB);
     transition: 500ms;
     cursor: pointer;
     padding: .5rem;
-    border-radius: 100vh;
+    border-radius: .25rem;
 }
 
-.calendar .btn-date {
-    flex-basis: 2rem;
-    height: 2rem;
+.calendar-input .month > div button:hover {
+    color: var(--calendar-arrow-button-color-alternative, #FFF);
+    background-color: var(--calendar-arrow-button-background-color-alternative, #222);
+}
+
+.calendar-input .month .week-names {
+    grid-column: span 5 / span 5;
+    display: grid;
+    gap: .5rem;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.calendar-input .month .week-names span {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--calendar-button-color);
-    background-color: var(--calendar-button-background-color);
+}
+
+.calendar-input .days {
+    display: grid;
+    gap: .5rem;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.calendar-input .days .date {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.calendar-input .days .date input {
+    display: none;
+}
+
+.calendar-input .days .date .date-btn {
+    flex-basis: 2rem;
+    height: 2rem;
+    min-width: 100%;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--calendar-date-button-color, #FFF);
+    background-color: var(--calendar-date-button-background-color, #BBB);
     transition: 500ms;
     padding: .5rem;
-    border-radius: 100vh;
+    border-radius: .25rem;
 }
 
-.calendar .today .btn-date {
-    box-shadow: inset 0 0 0 3px var(--color-black),
-                0 0 0 3px var(--color-one);
+.calendar-input .days .date input:not(:disabled) + .date-btn:hover {
+    color: var(--calendar-date-button-color-alternative, #FFF);
+    background-color: var(--calendar-date-button-background-color-alternative, #222);
 }
 
-.calendar input:not(:disabled) + .btn-date {
+.calendar-input .days .date input:not(:disabled):checked.selected + .date-btn {
+    box-shadow: inset 0 0 0 var(--calendar-border-width, 3px) var(--calendar-selected-date-border-inset-color, #BBB),
+                0 0 0 var(--calendar-border-width, 3px) var(--calendar-selected-date-border-color, #222);
+}
+
+.calendar-input .days .date.today .date-btn {
+    box-shadow: inset 0 0 0 var(--calendar-border-width, 3px) var(--calendar-today-date-button-border-inset-color, #FFF),
+                0 0 0 var(--calendar-border-width, 3px) var(--calendar-today-date-button-border-color, #222);
+}
+
+.calendar-input .days .date input:not(:disabled) + .date-btn {
     cursor: pointer;
 }
 
-.calendar input:disabled + .btn-date {
+.calendar-input .days .date input:disabled + .date-btn {
     cursor: not-allowed;
-    opacity: .4;
+    color: var(--calendar-date-button-disabled-color, #BBB);
+    background-color: var(--calendar-date-button-disabled-background-color, #EEE);
 }
 
-.calendar .today input:not(:disabled):checked + .btn-date,
-.calendar .today input:not(:disabled) + .btn-date:hover {
-    box-shadow: inset 0 0 0 3px var(--color-black),
-                0 0 0 3px var(--color-four);
+.calendar-input .days .date.today input:disabled + .date-btn {
+    cursor: not-allowed;
+    box-shadow: inset 0 0 0 var(--calendar-border-width, 3px) var(--calendar-today-date-button-border-inset-color, #FFF),
+                0 0 0 var(--calendar-border-width, 3px) var(--calendar-today-date-button-border-color, #222);
 }
 
-.calendar input:not(:disabled):checked + .btn-date,
-.calendar input:not(:disabled) + .btn-date:hover {
-    color: var(--calendar-button-color-alternative);
-    background-color: var(--calendar-button-background-color-alternative);
+.calendar-input .days .date.today input:not(:disabled):checked + .date-btn,
+.calendar-input .days .date.today input:not(:disabled) + .date-btn:hover {
+    box-shadow: inset 0 0 0 var(--calendar-border-width, 3px) var(--calendar-today-date-button-border-inset-color-alternative, #BBB),
+                0 0 0 var(--calendar-border-width, 3px) var(--calendar-today-date-button-border-color-alternative, #000);
 }
 
-.calendar input:not(:disabled) + .btn-date:focus {
+.calendar-input .days .date input:not(:disabled):checked + .date-btn,
+.calendar-input .days .date input:not(:disabled) + .date-btn:hover {
+    color: var(--calendar-date-button-color-alternative, #FFF);
+    background-color: var(--calendar-date-button-background-color-alternative, #222);
+}
+
+.calendar-input .days .date input:not(:disabled) + .date-btn:focus {
     outline: none;
-    color: var(--calendar-button-color-alternative);
-    box-shadow: inset 0 0 0 3px var(--color-black),
-                0 0 0 3px var(--calendar-button-background-color);
+    color: var(--calendar-date-button-color-alternative);
+    box-shadow: inset 0 0 0 var(--calendar-border-width, 3px) var(--calendar-date-button-border-inset-color, #FFF),
+                0 0 0 var(--calendar-border-width, 3px) var(--calendar-date-button-boder-color, #BBB);
 }
 
 /* ? MD */

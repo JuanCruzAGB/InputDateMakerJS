@@ -1,98 +1,36 @@
 // ? JuanCruzAGB repository
 import Class from "../../JuanCruzAGB/js/Class.js";
 
-/** @var {object} months Months in multiple locations. */
-let months = {
-    en: [
-        { id_month: 1, name: 'January', short: 'Jan' },
-        { id_month: 2, name: 'February', short: 'Feb' },
-        { id_month: 3, name: 'March', short: 'Mar' },
-        { id_month: 4, name: 'April', short: 'Apr' },
-        { id_month: 5, name: 'May', short: 'May' },
-        { id_month: 6, name: 'June', short: 'Jun' },
-        { id_month: 7, name: 'July', short: 'Jul' },
-        { id_month: 8, name: 'August', short: 'Aug' },
-        { id_month: 9, name: 'September', short: 'Sep' },
-        { id_month: 10, name: 'October', short: 'Oct' },
-        { id_month: 11, name: 'November', short: 'Nov' },
-        { id_month: 12, name: 'December', short: 'Dec' },
-    ], es: [
-        { id_month: 0, name: 'Enero', short: 'Ene' },
-        { id_month: 2, name: 'Febrero', short: 'Feb' },
-        { id_month: 3, name: 'Marzo', short: 'Maz' },
-        { id_month: 4, name: 'Abril', short: 'Abr' },
-        { id_month: 5, name: 'Mayo', short: 'May' },
-        { id_month: 6, name: 'Junio', short: 'Jun' },
-        { id_month: 7, name: 'Julio', short: 'Jul' },
-        { id_month: 8, name: 'Agosto', short: 'Ago' },
-        { id_month: 9, name: 'Septiembre', short: 'Sep' },
-        { id_month: 10, name: 'Octubre', short: 'Oct' },
-        { id_month: 11, name: 'Noviembre', short: 'Nov' },
-        { id_month: 12, name: 'Diciembre', short: 'Dic' },
-    ],
-};
-
-/** @var {object} days Days in multiple locations. */
-let days = {
-    en: [
-        { id_day: 0, name: 'Sunday', short: 'Sun', letter: 'S' },
-        { id_day: 1, name: 'Monday', short: 'Mon', letter: 'M' },
-        { id_day: 2, name: 'Tuesday', short: 'Tue', letter: 'T' },
-        { id_day: 3, name: 'Wednesday', short: 'Wed', letter: 'W' },
-        { id_day: 4, name: 'Thursday', short: 'Thu', letter: 'X' },
-        { id_day: 5, name: 'Friday', short: 'Fri', letter: 'F' },
-        { id_day: 6, name: 'Saturday', short: 'Sat', letter: 'S' },
-    ], es: [
-        { id_day: 0, name: 'Domingo', short: 'Dom', letter: 'D' },
-        { id_day: 1, name: 'Lunes', short: 'Lun', letter: 'L' },
-        { id_day: 2, name: 'Martes', short: 'Mar', letter: 'M' },
-        { id_day: 3, name: 'Miércoles', short: 'Mie', letter: 'X' },
-        { id_day: 4, name: 'Jueves', short: 'Jue', letter: 'J' },
-        { id_day: 5, name: 'Vierne', short: 'Vie', letter: 'V' },
-        { id_day: 6, name: 'Sábado', short: 'Sab', letter: 'S' },
-    ],
-};
-
-/** @var {object} defaultProps Default properties. */
-let defaultProps = {
-    id: 'input-1',
-    lang: 'en',
-    // ? datesFilter: false,
-    availableWeekDays: [],
-    // TODO availableDates: [],
-    date: new Date(),
-    today: new Date(),
-    // TODO button_prev: null,
-    // TODO button_next: null,
-};
-
-/** @var {object} defaultState Default state. */
-let defaultState = {
-    enablePastDates: true,
-    enableToday: true,
-};
+// ? InputDateMaker repository
+import Months from "./Months.js";
+import Week from "./Week.js";
 
 /**
  * * InputDateMaker makes an excellent substitute for the <input> type date.
  * @export
  * @class InputDateMaker
- * @extends {Class}
  * @author Juan Cruz Armentia <juancarmentia@gmail.com>
+ * @extends {Class}
  */
 export class InputDateMaker extends Class {
     /**
      * * Creates an instance of InputDateMaker.
      * @param {object} [props] InputDateMaker properties:
-     * @param {string} [id='input-1'] Input HTML element primary key.
-     * @param {string} [lang='en'] Calendar location.
-     * @param {object} [availableWeekDays] Calendar available week days.
-     * @param {date} [today] Today's date.
+     * @param {string} [props.id='input-1'] Input HTML element primary key.
+     * @param {string} [props.lang='en'] Calendar location.
+     * @param {object} [props.availableWeekDays] Calendar available week days.
+     * @param {date} [props.today] Today's date.
+     * @param {string} [props.name] Input name.
+     * @param {string[]} [props.classes] Input class names to add.
+     * @param {number} [props.quantity=1] Quantity of dates to select.
      * @param {object} [state] InputDateMaker state:
-     * @param {boolean} [enablePastDates=true] Enable past dates.
-     * @param {boolean} [enableToday=true] Enable today's date.
+     * @param {boolean} [state.enablePastDates=true] Enable past dates.
+     * @param {boolean} [state.enableToday=true] Enable today's date.
+     * @param {HTMLElement|false} [state.generate=false] If the Input has to be generated.
+     * @param {boolean} [state.uncheck=true] Enable uncheck a date from the multiple selections.
      * @param {object} [callback] InputDateMaker callback:
-     * @param {fuction} [function] On change date function callback.
-     * @param {object} [params] On change date function callback params.
+     * @param {fuction} [callback.function] On change date function callback.
+     * @param {*} [callback.params] On change date function callback params.
      * @memberof InputDateMaker
      */
     constructor (props = {
@@ -100,23 +38,46 @@ export class InputDateMaker extends Class {
         lang: 'en',
         availableWeekDays: [],
         today: new Date(),
+        name: 'date',
+        classes: [],
+        quantity: 1,
     }, state = {
         enablePastDates: true,
         enableToday: true,
+        generate: false,
+        uncheck: true,
     }, callback = {
         function: function (e) { /* console.log('Date changed') */ },
-        params: {
-            //
-    }}) {
-        super({ ...defaultProps, ...props }, { ...defaultState, ...state });
-        this.setCallbacks({ default: callback });
-        this.setHTML(`#${ this.props.id }`);
-        this.generateMonthDays(new Date());
-        this.generateInnerHTML();
+        params: {},
+    }) {
+        super({ ...InputDateMaker.props, ...props }, { ...InputDateMaker.state, ...state });
+        this.setCallbacks({ default: { ...InputDateMaker.callback, ...callback } });
+        this.checkState();
+        this.setMonthDays(new Date());
+        this.createCalendar();
         if (this.state.enableToday) {
-            this.changeHTMLValue(this.props.today.toISOString().substring(0, 10));
-        } else {
-            this.changeHTMLValue();
+            for (const day of this.days) {
+                if (day.value === this.props.today.getDate()) {
+                    this.changeValue(day.id);
+                }
+            }
+        }
+    }
+
+    /**
+     * * Set an <input>
+     * @param {HTMLElement} html
+     * @memberof InputDateMaker
+     */
+    setHTMLs (html = null) {
+        if (!this.htmls) {
+            this.htmls = [];
+        }
+        if (html !== null) {
+            this.htmls.push(html);
+        }
+        if (html === null) {
+            console.error("Param must be an HTML Element");
         }
     }
 
@@ -125,7 +86,7 @@ export class InputDateMaker extends Class {
      * @param {date} date
      * @memberof InputDateMaker
      */
-    generateMonthDays (date) {
+    setMonthDays (date) {
         date.setDate(1);
         this.setProps('firstMonthDay', new Date(date));
         let dayNumber = date.getDay() + 1;
@@ -136,17 +97,64 @@ export class InputDateMaker extends Class {
     }
 
     /**
+     * * Check the InputDateMaker state.
+     * @memberof InputDateMaker
+     */
+    checkState () {
+        this.checkGenerateState();
+    }
+
+    /**
+     * * Check the generate <input> state
+     * @memberof InputDateMaker
+     */
+    checkGenerateState () {
+        if (this.state.generate) {
+            this.createHTMLs();
+        }
+        if (!this.state.generate) {
+            for (const key in document.querySelectorAll(`input.${ this.props.id }`)) {
+                if (Object.hasOwnProperty.call(document.querySelectorAll(`input.${ this.props.id }`), key)) {
+                    const html = document.querySelectorAll(`input.${ this.props.id }`)[key];
+                    if (parseInt(key) < this.props.quantity) {
+                        this.setHTMLs(html);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * * Creates an <input>
+     * @param {number} [length=1] Quantity of <input> to create.
+     * @memberof InputDateMaker
+     */
+    createHTMLs () {
+        for (let index = 0; index < this.props.quantity; index++) {
+            let html = document.createElement('input');
+            html.classList.add("hidden");
+            for (const className of this.props.classes) {
+                html.classList.add(className);
+            }
+            html.name = this.props.name;
+            html.type = 'date';
+            this.state.generate.appendChild(html);
+            this.setHTMLs(html);
+        }
+    }
+
+    /**
      * * Makes the calendar.
      * @memberof InputDateMaker
      */
-    generateInnerHTML () {
-        let parent = this.html.parentNode;
+    createCalendar () {
+        let parent = this.htmls[0].parentNode;
         if (this.calendar) {
             parent.removeChild(this.calendar);
         }
-        this.calendar = document.createElement('div');
-        this.calendar.classList.add('calendar', 'grid', 'grid-cols-1');
-        parent.insertBefore(this.calendar, this.html.nextSibling);
+        this.calendar = document.createElement('aside');
+        this.calendar.classList.add("calendar-input");
+        parent.insertBefore(this.calendar, this.htmls[0]);
         this.printHeader();
         this.printMain();
     }
@@ -157,47 +165,45 @@ export class InputDateMaker extends Class {
      */
     printHeader () {
         let instance = this;
-        let header = document.createElement('section');
-        header.classList.add('month', 'grid', 'grid-cols-7', 'mb-4');
+        let header = document.createElement('header');
+        header.classList.add("month");
         this.calendar.appendChild(header);
-            let buttonDiv = document.createElement('div');
-            buttonDiv.classList.add('flex', 'justify-center', 'items-center');
-            header.appendChild(buttonDiv);
+            let prevDiv = document.createElement('div');
+            header.appendChild(prevDiv);
                 let prev = document.createElement('button');
-                buttonDiv.appendChild(prev);
-                prev.classList.add('mb-4');
+                prevDiv.appendChild(prev);
                 prev.addEventListener('click', function (e) {
                     e.preventDefault();
                     instance.changeMonth(-1);
                 });
                     let icon = document.createElement('i');
-                    icon.classList.add('fas', 'fa-chevron-left');
+                    icon.classList.add("fas", "fa-chevron-left");
                     prev.appendChild(icon);
+
             let title = document.createElement('span');
             header.appendChild(title);
-            title.classList.add('flex', 'justify-center', 'items-center', 'col-span-5', 'color-white', 'mb-4');
-            title.innerHTML = `${ months[this.props.lang][this.props.firstMonthDay.getMonth()].name } ${ this.props.firstMonthDay.getFullYear() }`;
-            buttonDiv = document.createElement('div');
-            buttonDiv.classList.add('flex', 'justify-center', 'items-center');
-            header.appendChild(buttonDiv);
+            title.classList.add("name");
+            title.innerHTML = `${ Months[this.props.lang][this.props.firstMonthDay.getMonth()].name } ${ this.props.firstMonthDay.getFullYear() }`;
+
+            let nextDiv = document.createElement('div');
+            header.appendChild(nextDiv);
                 let next = document.createElement('button');
-                buttonDiv.appendChild(next);
-                next.classList.add('mb-4');
+                nextDiv.appendChild(next);
                 next.addEventListener('click', function (e) {
                     e.preventDefault();
                     instance.changeMonth(+1);
                 });
                     icon = document.createElement('i');
-                    icon.classList.add('fas', 'fa-chevron-right');
+                    icon.classList.add("fas", "fa-chevron-right");
                     next.appendChild(icon);
-            let daysDiv = document.createElement('div');
-            daysDiv.classList.add('col-span-7', 'grid', 'grid-cols-7', 'gap-2', 'xl:gap-4', 'color-white');
-            header.appendChild(daysDiv);
-                for (const day of days[this.props.lang]) {
-                    let dayDiv = document.createElement('div');
-                    dayDiv.innerHTML = day.letter;
-                    dayDiv.classList.add('flex', 'justify-center', 'items-center');
-                    daysDiv.appendChild(dayDiv);
+
+            let days = document.createElement('div');
+            days.classList.add("week-names");
+            header.appendChild(days);
+                for (const day of Week[this.props.lang]) {
+                    let span = document.createElement('span');
+                    span.innerHTML = day.letter;
+                    days.appendChild(span);
                 }
     }
 
@@ -208,38 +214,50 @@ export class InputDateMaker extends Class {
     printMain () {
         this.inputs = [];
         let instance = this;
-        let main = document.createElement('section');
-        main.classList.add('days', 'grid', 'grid-cols-7', 'gap-2', 'xl:gap-4');
+        let main = document.createElement('main');
+        main.classList.add("days");
         this.calendar.appendChild(main);
+        this.days = [];
         for (let day = 1; day <= this.props.days; day++) {
-            let date = document.createElement('div');
-            date.classList.add('date');
+            let date = document.createElement('label');
+            date.classList.add("date");
             if (this.props.today.getMonth() === this.props.firstMonthDay.getMonth() && day - this.props.firstMonthDay.getDay() === this.props.today.getDate()) {
-                date.classList.add('today');
+                date.classList.add("today");
             }
             main.appendChild(date);
                 if (day - this.props.firstMonthDay.getDay() > 0 && day - this.props.firstMonthDay.getDay() <= this.props.lastMonthDay.getDate()) {
                     let input = document.createElement('input');
                     this.inputs.push(input);
+                    input.dataset.date = `${ this.props.firstMonthDay.getFullYear() }-${ (this.props.firstMonthDay.getMonth() + 1 < 10 ? `0${ this.props.firstMonthDay.getMonth() + 1 }` : this.props.firstMonthDay.getMonth() + 1) }-${ (day - this.props.firstMonthDay.getDay() < 10 ? `0${ day - this.props.firstMonthDay.getDay() }` : day - this.props.firstMonthDay.getDay()) }`;
                     input.id = `${ this.props.id }-day-${ day }`;
-                    input.type = 'radio';
-                    input.name = `${ this.props.id }-calendar-day`;
+                    if (this.props.quantity > 1) {
+                        input.type = 'checkbox';
+                        input.name = `${ this.props.id }-calendar-day[${ day - this.props.firstMonthDay.getDay() }]`;
+                    }
+                    if (this.props.quantity <= 1) {
+                        input.type = 'radio';
+                        input.name = `${ this.props.id }-calendar-day`;
+                    }
                     input.value = day - this.props.firstMonthDay.getDay();
-                    let label = document.createElement('label');
-                    label.classList.add('btn-date');
-                    label.htmlFor = `${ this.props.id }-day-${ day }`;
-                    label.addEventListener('click', function (e) {
-                        instance.changeHTMLValue(`${ instance.props.firstMonthDay.getFullYear() }-${ (instance.props.firstMonthDay.getMonth() + 1 < 10 ? `0${ instance.props.firstMonthDay.getMonth() + 1 }` : instance.props.firstMonthDay.getMonth() + 1) }-${ (day - instance.props.firstMonthDay.getDay() < 10 ? `0${ day - instance.props.firstMonthDay.getDay() }` : day - instance.props.firstMonthDay.getDay()) }`); 
+                    input.classList.add("hidden", "date-input");
+                    input.addEventListener('change', function (e) {
+                        instance.changeValue(`${ instance.props.id }-day-${ day }`);
                     });
-                        let span = document.createElement('span');
-                        span.innerHTML = day - this.props.firstMonthDay.getDay();
-                    if (this.html.value) {
-                        let dateValue = this.html.value.split('-');
-                        if (parseInt(dateValue[0]) === this.props.firstMonthDay.getFullYear() && parseInt(dateValue[1]) === this.props.firstMonthDay.getMonth() + 1 && parseInt(dateValue[2]) === day - this.props.firstMonthDay.getDay()) {
+                    this.days.push(input);
+
+                    let number = document.createElement('span');
+                    number.classList.add("date-btn");
+                    number.innerHTML = day - this.props.firstMonthDay.getDay();
+                    for (const html of this.htmls) {
+                        if (html.value) {
+                            let value = html.value.split('-');
+                            if (parseInt(value[0]) === this.props.firstMonthDay.getFullYear() && parseInt(value[1]) === this.props.firstMonthDay.getMonth() + 1 && parseInt(value[2]) === day - this.props.firstMonthDay.getDay()) {
+                                input.checked = true;
+                            }
+                        }
+                        if (this.props.today.getMonth() === this.props.firstMonthDay.getMonth() && day - this.props.firstMonthDay.getDay() === this.props.today.getDate() && !html.value) {
                             input.checked = true;
                         }
-                    } else if (this.props.today.getMonth() === this.props.firstMonthDay.getMonth() && day - this.props.firstMonthDay.getDay() === this.props.today.getDate() && !this.html.value) {
-                        input.checked = true;
                     }
                     if (this.props.availableWeekDays.length) {
                         input.disabled = true;
@@ -249,12 +267,11 @@ export class InputDateMaker extends Class {
                             }
                         }
                         date.appendChild(input);
-                        date.appendChild(label);
-                        label.appendChild(span);
-                    } else {
+                        date.appendChild(number);
+                    }
+                    if (!this.props.availableWeekDays.length) {
                         date.appendChild(input);
-                        date.appendChild(label);
-                        label.appendChild(span);
+                        date.appendChild(number);
                     }
                     if (!this.state.enablePastDates) {
                         if (day - this.props.firstMonthDay.getDay() < 1 || this.props.firstMonthDay.getMonth() < this.props.today.getMonth() || (day - this.props.firstMonthDay.getDay() < this.props.today.getDate() && this.props.firstMonthDay.getMonth() === this.props.today.getMonth())) {
@@ -263,7 +280,7 @@ export class InputDateMaker extends Class {
                         }
                     }
                     if (!this.state.enableToday) {
-                        if (day - this.props.firstMonthDay.getDay() === this.props.today.getDate()) {
+                        if (`${ this.props.firstMonthDay.getFullYear() }-${ (this.props.firstMonthDay.getMonth() + 1 < 10 ? `0${ this.props.firstMonthDay.getMonth() + 1 }` : this.props.firstMonthDay.getMonth() + 1) }-${ (day - this.props.firstMonthDay.getDay() < 10 ? `0${ day - this.props.firstMonthDay.getDay() }` : day - this.props.firstMonthDay.getDay()) }` === `${ this.props.today.getFullYear() }-${ (this.props.today.getMonth() + 1 < 10 ? `0${ this.props.today.getMonth() + 1 }` : this.props.today.getMonth() + 1) }-${ (this.props.today.getDate() < 10 ? `0${ this.props.today.getDate() }` : this.props.today.getDate()) }`) {
                             input.disabled = true;
                             input.checked = false;
                         }
@@ -280,24 +297,178 @@ export class InputDateMaker extends Class {
     changeMonth (plus) {
         let date = new Date(this.props.firstMonthDay);
         date.setMonth(date.getMonth() + plus);
-        this.generateMonthDays(date);
-        this.generateInnerHTML();
+        this.setMonthDays(date);
+        this.createCalendar();
     }
 
     /**
      * * Change the <input> value.
-     * @param {string} [value] <input> new value.
+     * @param {string} id_day <input> id.
      * @memberof InputDateMaker
      */
-    changeHTMLValue (value) {
-        this.html.value = value;
-        this.callbacks.default.function({ ...this.callbacks.default.params, inputDateMaker: this });
+    changeValue (id_day = '') {
+        this.setProps('selectedIndex', (this.props.selectedIndex ? this.props.selectedIndex : []));
+        let day = document.querySelector(`input#${ id_day }`);
+        for (const html of this.days) {
+            html.classList.remove('selected');
+        }
+        day.classList.add('selected');
+        let dates = [], selected = {};
+        let date = `${ this.props.firstMonthDay.getFullYear() }-${ (this.props.firstMonthDay.getMonth() + 1 < 10 ? `0${ this.props.firstMonthDay.getMonth() + 1 }` : this.props.firstMonthDay.getMonth() + 1) }-${ (parseInt(day.value) < 10 ? `0${ parseInt(day.value) }` : parseInt(day.value)) }`;
+        if (day.checked) {
+            for (const html of this.htmls) {
+                if (html.value) {
+                    dates.push(html.value);
+                }
+            }
+
+            if (dates.length >= this.props.quantity) {
+                let html = this.htmls.shift();
+                this.props.selectedIndex.shift();
+                html.value = date;
+                let index = 1;
+                for (const selectedIndex of this.props.selectedIndex) {
+                    if (index <= parseInt(selectedIndex.index)) {
+                        index = parseInt(selectedIndex.index) + 1;
+                    }
+                }
+                this.props.selectedIndex.push({
+                    index: index,
+                    date: date,
+                    input: day,
+                });
+                selected = this.props.selectedIndex[this.props.selectedIndex.length - 1];
+                this.htmls.push(html);
+            } else {
+                let html = this.htmls.shift();
+                html.value = date;
+                let index = 1;
+                for (const selectedIndex of this.props.selectedIndex) {
+                    if (index <= parseInt(selectedIndex.index)) {
+                        index = parseInt(selectedIndex.index) + 1;
+                    }
+                }
+                this.props.selectedIndex.push({
+                    index: index,
+                    date: date,
+                    input: day,
+                });
+                selected = this.props.selectedIndex[this.props.selectedIndex.length - 1];
+                this.htmls.push(html);
+            }
+
+            days: for (const input of this.days) {
+                if (!input.checked) {
+                    continue;
+                }
+                for (const html of this.htmls) {
+                    if (`${ this.props.firstMonthDay.getFullYear() }-${ (this.props.firstMonthDay.getMonth() + 1 < 10 ? `0${ this.props.firstMonthDay.getMonth() + 1 }` : this.props.firstMonthDay.getMonth() + 1) }-${ (parseInt(input.value) < 10 ? `0${ parseInt(input.value) }` : parseInt(input.value)) }` === html.value) {
+                        continue days;
+                    }
+                }
+                input.checked = false;
+            }
+        }
+
+        if (!day.checked) {
+            let indexes = [], keys = [];
+            if (this.state.uncheck) {
+                for (const key in this.htmls) {
+                    if (Object.hasOwnProperty.call(this.htmls, key)) {
+                        const html = this.htmls[key];
+                        if (html.value === date) {
+                            html.value = null;
+                            keys.push(key);
+                        }
+                    }
+                }
+                let remove = 0;
+                for (const key of keys) {
+                    selected = this.props.selectedIndex[key - remove];
+                    this.props.selectedIndex.splice((key - remove), 1)[0];
+                    remove++;
+                }
+            }
+
+            if (!this.state.uncheck) {
+                for (const key in [...this.props.selectedIndex]) {
+                    if (Object.hasOwnProperty.call(this.props.selectedIndex, key)) {
+                        const index = this.props.selectedIndex[key];
+                        if (date === index.date) {
+                            keys.push(key);
+                            indexes.push(index);
+                        }
+                    }
+                }
+                let remove = 0;
+                for (const key of keys) {
+                    selected = this.props.selectedIndex[key - remove];
+                    this.props.selectedIndex.splice((key - remove), 1)[0];
+                    remove++;
+                }
+                for (const index of indexes) {
+                    this.props.selectedIndex.push(index);
+                }
+                day.checked = true;
+            }
+        }
+
+        dates = [];
+        for (const html of this.htmls) {
+            if (html.value) {
+                dates.push(html.value);
+            }
+        }
+
+        this.execute('default', {
+            inputDateMaker: this,
+            dates: dates,
+            clicked: { state: day.checked, ...selected },
+        });
+    }
+
+    /** 
+     * @static
+     * @var {object} props Default properties.
+     */
+    static props = {
+        id: 'input-1',
+        lang: 'en',
+        availableWeekDays: [],
+        date: new Date(),
+        today: new Date(),
+        name: 'date',
+        classes: [],
+        quantity: 1,
+        // TODO availableDates: [],
+        // TODO button_prev: null,
+        // TODO button_next: null,
+    }
+
+    /** 
+     * @static
+     * @var {object} state Default state.
+     */
+    static state = {
+        enablePastDates: true,
+        enableToday: true,
+        generate: false,
+        uncheck: true,
+    }
+
+    /** 
+     * @static
+     * @var {object} callback Default callback.
+     */
+    static callback = {
+        function: function (e) { /* console.log('Date changed') */ },
+        params: {},
     }
 }
 
 // ? InputDateMaker childs
-InputDateMaker.months = months;
-InputDateMaker.days = days;
+InputDateMaker.Months = Months;
+InputDateMaker.Week = Week;
 
 // ? Default export 
 export default InputDateMaker;
