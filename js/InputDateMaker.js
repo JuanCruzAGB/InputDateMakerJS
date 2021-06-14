@@ -29,8 +29,8 @@ export class InputDateMaker extends Class {
      * @param {HTMLElement|false} [state.generate=false] If the Input has to be generated.
      * @param {boolean} [state.uncheck=true] Enable uncheck a date from the multiple selections.
      * @param {object} [callback] InputDateMaker callback:
-     * @param {fuction} [callback.function] On change date function callback.
-     * @param {*} [callback.params] On change date function callback params.
+     * @param {fuction} [callback.function] On change function callback.
+     * @param {*} [callback.params] On change function callback params.
      * @memberof InputDateMaker
      */
     constructor (props = {
