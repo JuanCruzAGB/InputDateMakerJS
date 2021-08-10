@@ -54,14 +54,14 @@ input.hidden {
     background-color: var(--calendar-arrow-button-background-color-alternative, #222);
 }
 
-.calendar-input .month .week-names {
+.calendar-input .month .week {
     grid-column: span 5 / span 5;
     display: grid;
     gap: .5rem;
     grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
-.calendar-input .month .week-names span {
+.calendar-input .month .week span {
     display: flex;
     justify-content: center;
     align-items: center;
