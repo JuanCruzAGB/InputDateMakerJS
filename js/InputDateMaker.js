@@ -45,12 +45,15 @@ export default class InputDateMaker extends Class {
      * @param {object} [data.callbacks.add] On add callback:
      * @param {fuction} [data.callbacks.add.function] On add function callback.
      * @param {*} [data.callbacks.add.params] On add function callback params.
-     * @param {object} [data.callbacks.change] On change callback:
-     * @param {fuction} [data.callbacks.change.function] On change function callback.
-     * @param {*} [data.callbacks.change.params] On change function callback params.
+     * @param {object} [data.callbacks.changeMonth] On change month callback:
+     * @param {fuction} [data.callbacks.changeMonth.function] On change month function callback.
+     * @param {*} [data.callbacks.changeMonth.params] On change month function callback params.
      * @param {object} [data.callbacks.remove] On remove callback:
      * @param {fuction} [data.callbacks.remove.function] On remove function callback.
      * @param {*} [data.callbacks.remove.params] On remove function callback params.
+     * @param {object} [data.callbacks.update] On update callback:
+     * @param {fuction} [data.callbacks.update.function] On update function callback.
+     * @param {*} [data.callbacks.update.params] On update function callback params.
      * @memberof InputDateMaker
      */
     constructor (data = {
@@ -81,11 +84,14 @@ export default class InputDateMaker extends Class {
             add: {
                 function: function (params = {}) { /* console.log("Added Date") */ },
                 params: {},
-            }, change: {
-                function: function (params = {}) { /* console.log("Date changed") */ },
+            }, changeMonth: {
+                function: function (params = {}) { /* console.log("Month changed") */ },
                 params: {},
             }, remove: {
                 function: function (params = {}) { /* console.log("Removed Date") */ },
+                params: {},
+            }, update: {
+                function: function (params = {}) { /* console.log("Date updated") */ },
                 params: {},
     },}}) {
         // * Instance
@@ -391,10 +397,11 @@ export default class InputDateMaker extends Class {
 
     /**
      * * Change the calendar current month.
-     * @param {number} plus Months to add.
+     * @param {number} [plus=+1] Months to add.
+     * @param {object} [params] Change Month callback function params.
      * @memberof InputDateMaker
      */
-    changeMonth (plus = +1) {
+    changeMonth (plus = +1, params = {}) {
         // * Get the next month
         let date = new Date(this.props.firstMonthDay);
         date.setMonth(date.getMonth() + plus);
@@ -404,6 +411,17 @@ export default class InputDateMaker extends Class {
 
         // * Create a new calendar
         this.setCalendar();
+
+        // * Execute the change month callback
+        this.execute("changeMonth", {
+            inputDateMaker: this,
+            ...this.callbacks.changeMonth.params,
+            firstMonthDay: this.props.firstMonthDay,
+            lastMonthDay: this.props.lastMonthDay,
+            days: this.props.days,
+            currentMonth: Months[this.props.lang][this.props.firstMonthDay.getMonth()],
+            ...params,
+        });
     }
 
     /**
@@ -571,10 +589,10 @@ export default class InputDateMaker extends Class {
             ...params,
         });
 
-        // * Execute the change callback
-        this.execute("change", {
+        // * Execute the update callback
+        this.execute("update", {
             inputDateMaker: this,
-            ...this.callbacks.change.params,
+            ...this.callbacks.update.params,
             dates: this.props.selectedIndex,
             current: { state: day.checked, ...selected },
             ...params,
@@ -640,10 +658,10 @@ export default class InputDateMaker extends Class {
             ...params,
         });
 
-        // * Execute the change callback
-        this.execute("change", {
+        // * Execute the update callback
+        this.execute("update", {
             inputDateMaker: this,
-            ...this.callbacks.change.params,
+            ...this.callbacks.update.params,
             dates: this.props.selectedIndex,
             current: { state: day.checked, ...selected },
             ...params,
@@ -713,11 +731,14 @@ export default class InputDateMaker extends Class {
         add: {
             function: function (params = {}) { /* console.log("Added Date") */ },
             params: {},
-        }, change: {
-            function: function (params = {}) { /* console.log("Date changed") */ },
+        }, changeMonth: {
+            function: function (params = {}) { /* console.log("Month changed") */ },
             params: {},
         }, remove: {
             function: function (params = {}) { /* console.log("Removed Date") */ },
+            params: {},
+        }, update: {
+            function: function (params = {}) { /* console.log("Date updated") */ },
             params: {},
     },}
 
